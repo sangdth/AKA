@@ -1,24 +1,37 @@
-import React from "react";
-import logo from "@assets/img/logo.svg";
-import "@pages/popup/Popup.css";
+import { useState, useEffect } from 'react';
+import logo from '@assets/img/logo.svg';
+import '@pages/popup/Popup.css';
 
 const Popup = () => {
+  const [currentTab, setCurrentTab] = useState('');
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function getCurrentTab() {
+      const queryOptions = { active: true, lastFocusedWindow: true };
+
+      const [tab] = await chrome.tabs.query(queryOptions);
+
+      if (!ignore) {
+        setCurrentTab(tab.id.toString());
+      }
+
+      return tab;
+    }
+
+    getCurrentTab();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/pages/popup/Popup.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React!
-        </a>
+        <p>Current tab ID: {currentTab} </p>
       </header>
     </div>
   );
